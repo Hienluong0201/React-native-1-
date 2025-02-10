@@ -1,17 +1,9 @@
 import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState,useCallback  } from "react";
 import { FlashList } from "@shopify/flash-list";
+import AxiosInstance from "../helpers/AxiosInstance";
 
-const DATA = [
-  { id: 1, title: "All" },
-  { id: 2, title: "Cappuccino" },
-  { id: 3, title: "Espresso" },
-  { id: 4, title: "Mocha" },
-  { id: 5, title: "Macchiato" },
-  { id: 6, title: "Americano" },
-  { id: 7, title: "Affogato" },
-  { id: 8, title: "Flat White" },
-];
+
 
 const DATA1 = [
   {
@@ -74,25 +66,51 @@ const DATA2 = [
 ];
 
 const Home = () => {
-  const [data, setData] = useState(DATA);
+ 
   const [selectedIndex, setSelectedIndex] = useState(0);
-
-  const renderCategoryItem = ({ item, index }) => (
-    <TouchableOpacity
-      onPress={() => setSelectedIndex(index)}
-      style={styles.itemContainer}
-    >
-      <Text
-        style={[
-          styles.textitem,
-          selectedIndex === index && { color: "#f17842" },
-        ]}
-      >
-        {item.title}
-      </Text>
-      {selectedIndex === index && <View style={styles.circle}></View>}
-    </TouchableOpacity>
-  );
+  const [categories, setCategories] = useState([])
+  useEffect(() => {
+    const getCategories = async () => {
+      try {
+        const response = await AxiosInstance().get("/categories");
+        if (response?.status && Array.isArray(response?.categories)) {
+          const formattedCategories = response.categories.map((item) => ({
+            id: item._id,
+            title: item.name,
+          }));
+          setCategories(formattedCategories);
+          console.log("📌 API Response:", response);
+        } else {
+          console.error("❌ Invalid API response format:", response);
+        }
+      } catch (error) {
+        console.error("❌ API Error:", error);
+      }
+    };
+    getCategories();
+  }, []);
+  
+  
+ const renderCategoryItem = useCallback(
+     ({ item, index }) => (
+       <TouchableOpacity
+         onPress={() => setSelectedIndex(index)}
+         style={styles.itemContainer}
+       >
+         <Text
+           style={[
+             styles.textitem,
+             selectedIndex === index && { color: "#f17842" },
+           ]}
+         >
+           {item.title}
+         </Text>
+         {selectedIndex === index && <View style={styles.circle}></View>}
+       </TouchableOpacity>
+     ),
+     [selectedIndex]
+   );
+ 
 
   const renderProductItem = ({ item }) => (
     <View style={styles.productCard}>
@@ -171,28 +189,30 @@ const Home = () => {
       <View style={styles.container1}>
         <View style={styles.flaslist1}>
         <FlashList
-          data={data}
-          renderItem={renderCategoryItem}
-          estimatedItemSize={200}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          extraData={selectedIndex}
-          keyExtractor={(item) => item.id.toString()}
+           data={categories}
+           renderItem={renderCategoryItem}
+           estimatedItemSize={50}
+           horizontal
+           showsHorizontalScrollIndicator={false}
+           extraData={selectedIndex}
+           keyExtractor={(item) => String(item.id)}
+           contentContainerStyle={styles.categoryList}
+          
         />
         </View>
         <View >
-        <FlashList
+         <FlashList
           data={DATA1}
           renderItem={renderProductItem}
           estimatedItemSize={150}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
-        />
+        /> 
         </View>
         {/* Chỉnh lại vị trí "Coffee beans" */}
-        <Text style={styles.Coffeebeans}>Coffee beans</Text>
-        <View>
+         <Text style={styles.Coffeebeans}>Coffee beans</Text> 
+        <View> 
 
         <FlashList
           data={DATA2}
@@ -201,7 +221,7 @@ const Home = () => {
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           keyExtractor={(item) => item.id.toString()}
-        />
+        /> 
         
         </View>
        
@@ -324,24 +344,29 @@ const styles = StyleSheet.create({
     right : 17
     
   },
+
+  categoryList: {
+    paddingVertical: 20,
+    paddingHorizontal: 1,
+  },
   itemContainer: {
-    height: 34,
+   
+    height: 20,
     alignItems: "center",
+    marginHorizontal: 8,
   },
   textitem: {
     fontSize: 14,
     fontWeight: "700",
-    marginRight: 10,
     color: "#aeaeae",
   },
   circle: {
-    width: 8,
+    width: 10,
     height: 8,
     borderRadius: 4,
     backgroundColor: "#d17842",
-    alignItems: "center",
-    marginRight: 10,
-    marginTop: 8,
+    alignSelf: "center",
+    marginTop: 4,
   },
   productCard: {
     backgroundColor: "#1E1E1E",
