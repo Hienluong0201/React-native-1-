@@ -1,5 +1,6 @@
 import { Text, View , StyleSheet, Image, TouchableOpacity } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
+import { Link } from "expo-router";
 
 export default function Login() {
 
@@ -53,18 +54,22 @@ export default function Login() {
       <Text style={myStyles.Kctk}>
       Don’t have account? Click {' '}
       </Text>
+      <Link href="/Register">
       <Text style={myStyles.click}>
       Register
       </Text>
+      </Link>
 
     </View>
     <View style={myStyles.rscontainer}>
       <Text style={myStyles.Kctk}>
       Forget Password? Click {' '} 
       </Text>
+      <Link href="/Register">
       <Text style={myStyles.click}>
       Reset
       </Text>
+      </Link>
 
     </View>
     </View>

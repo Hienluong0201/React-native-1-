@@ -1,13 +1,18 @@
-import Login from "./Login";
-import Register from "./Register";
-import HomeScreen from "./HomeScreen";
-import ProductDetail1 from "./ProductDetail1"
-import CoffeDetailsScreen from "./CoffeDetailsScreen"
-import Home from "./Home"
-import DomComponent  from "./dom"
+import { StyleSheet, Text, View,Button } from 'react-native'
+import React from 'react'
+import { Link } from 'expo-router'
 
-export default function Index() {
-  return <DomComponent />
-        
-
+const index = () => {
+  return (
+    <View>
+      <Text>index</Text>
+      <Link href="./Login" asChild>
+      <Button title="Login" />
+      </Link>
+    </View>
+  )
 }
+
+export default index
+
+const styles = StyleSheet.create({})

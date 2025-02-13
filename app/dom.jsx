@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
 import AxiosInstance from "../helpers/AxiosInstance";
 
-const Home = () => {
+const dom = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
@@ -69,9 +69,28 @@ const Home = () => {
     setSelectedIndex(index);
   };
 
+  const rendercatigory = ({ item, index }) => (
+    <TouchableOpacity
+      style={styles.itemContainer}
+      onPress={() => handleCategoryPress(index)}
+    >
+      <Text
+        style={[
+          styles.textitem,
+          {
+            color: index === selectedIndex ? "#d17842" : "#aeaeae",
+          },
+        ]}
+      >
+        {item.title}
+      </Text>
+      {index === selectedIndex && <View style={styles.circle} />}
+    </TouchableOpacity>
+  );
+
   return (
     <View style={styles.container}>
-      <ScrollView>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Tiêu đề */}
         <Text style={styles.headerText}>Find the best</Text>
         <Text style={styles.headerText1}>coffee for you</Text>
@@ -85,13 +104,7 @@ const Home = () => {
         {categories.length > 0 && (
           <FlashList
             data={categories}
-            renderItem={({ item, index }) => (
-              <TouchableOpacity onPress={() => handleCategoryPress(index)} style={styles.itemContainer}>
-                <Text style={[styles.textitem, selectedIndex === index && { color: "#f17842" }]}>
-                  {item.title}
-                </Text>
-              </TouchableOpacity>
-            )}
+            renderItem={rendercatigory}
             estimatedItemSize={50}
             horizontal
             showsHorizontalScrollIndicator={false}
@@ -134,14 +147,49 @@ const Home = () => {
             keyExtractor={(item) => item._id.toString()}
           />
         )}
+
+    <Text style={styles.Coffeebeans}>Coffee beans</Text> 
+        {products.length > 0 && (
+          <FlashList
+            data={products}
+            renderItem={({ item }) => (
+              <View style={styles.productCard}>
+                {/* Hiển thị đánh giá */}
+                <View style={styles.ratingContainer}>
+                  <Text style={styles.ratingText}>⭐ {item.rating}</Text>
+                </View>
+
+                {/* Ảnh sản phẩm */}
+                <Image source={{ uri: item.image }} style={styles.productImage} />
+
+                {/* Thông tin sản phẩm */}
+                <Text style={styles.productTitle}>{item.name}</Text>
+                <Text style={styles.productDescription}  numberOfLines={3}>{item.description}</Text>
+
+                {/* Footer sản phẩm */}
+                <View style={styles.productFooter}>
+                  <Text style={styles.dola}>$</Text>
+                  <Text style={styles.productPrice}>{item.price}</Text>
+                  <TouchableOpacity style={styles.addButton}>
+                    <Text style={styles.addButtonText}>+</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            )}
+            estimatedItemSize={150}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(item) => item._id.toString()}
+          />
+        )}
       </ScrollView>
-               <Text style={styles.Coffeebeans}>Coffee beans</Text> 
+              
       
     </View>
   );
 };
 
-export default Home;
+export default dom;
 
 const styles = StyleSheet.create({
   container: {
@@ -149,12 +197,20 @@ const styles = StyleSheet.create({
     backgroundColor: "#0c0f14",
     paddingLeft: 15,
   },
+  circle: {
+    width: 10,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#d17842",
+    alignSelf: "center",
+    marginTop: 4,
+  },
   Coffeebeans: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
-    marginTop: 20, // Tạo không gian cho "Coffee beans" không bị đè lên
-    marginBottom: 10, // Tạo khoảng cách phía dưới
+    marginTop: 10,
+    marginBottom: 10,
   },
   headerText: {
     fontSize: 28,
@@ -180,7 +236,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   itemContainer: {
-    height: 20,
+    marginVertical: 10,
+    height: 30,
     alignItems: "center",
     marginHorizontal: 8,
   },

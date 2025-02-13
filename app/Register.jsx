@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { TextInput } from 'react-native-gesture-handler'
-
+import { Link } from 'expo-router'
 const Register = () => {
   return (
     <View style={styles.container}>
@@ -47,18 +47,22 @@ const Register = () => {
     style={styles.eye}
           />
     </View>
-    <TouchableOpacity style={styles.registerbutton}>
+    <Link href="./dom" asChild>
+    <TouchableOpacity style={styles.registerbutton} >
       <Text style={styles.textregister}>
       Register
       </Text>
     </TouchableOpacity>
+    </Link>
     <View style={styles.dncontainer}>
       <Text style={styles.dntk}>
         You have an account? Click{' '}
       </Text>
+      <Link href="/Login">
       <Text style={styles.click}>
         Sign in 
       </Text>
+      </Link>
     </View>
     </View>
   )
