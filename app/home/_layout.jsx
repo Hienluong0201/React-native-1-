@@ -1,23 +1,46 @@
-import { Stack, Tabs, Slot } from "expo-router";
+import { Tabs } from "expo-router";
+import { Text, Image } from "react-native";
 
 export default function RootLayout() {
-  return(
+  return (
     <Tabs
-    screenOptions={({ route }) => {
+      screenOptions={({ route }) => {
+        const icons = {
+          index: require("../../assets/images/homee.png"),
+          cart: require("../../assets/images/shopppp.png"),
+          favorite: require("../../assets/images/Grouppp.png"),
+          notification: require("../../assets/images/thongbao.png"),
+        };
+
         return {
-            tabBarLabel: ({ focused }) => (
-                <Text style={{ color: focused ? "blue" : "black" }}>
-                    {route.name.toString()=="index"?"Home"
-                    :route.name.toString()=="register"?"Register"
-                    :route.name.toString()=="dom"?"Dom"
-                    :route.name.toString()=="Login"?"Login"
-                };
-
-                </Text>           )
-        }
-    }}
+          tabBarStyle:{
+              backgroundColor: 'black',
+          },
+          tabBarLabel: ({ focused }) => (
+            <Text style={{ color: focused ? "#d17842" : "#4e5053" }}>
+              {route.name === "index"
+                ? "Home"
+                : route.name === "cart"
+                ? "Cart"
+                : route.name === "favorite"
+                ? "Favorite"
+                : "Notification"}
+            </Text>
+          ),
+          headerShown: false,
+          tabBarIcon: ({ focused }) => (
+            <Image
+              source={icons[route.name]}
+              style={{ tintColor: focused ? "#d17842" : "#4e5053", width: 24, height: 24 }}
+            />
+          ),
+        };
+      }}
     >
-
+      <Tabs.Screen name="index"  />
+      <Tabs.Screen name="cart" options={{ title: "2" }} />
+      <Tabs.Screen name="favorite" options={{ title: "3" }} />
+      <Tabs.Screen name="notification" options={{ title: "4" }} />
     </Tabs>
   );
 }

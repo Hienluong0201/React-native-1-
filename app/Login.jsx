@@ -33,12 +33,13 @@ export default function Login() {
       style={myStyles.eye}
       />
     </View>
+    <Link href="/home" asChild>
     <TouchableOpacity style={myStyles.loginbutton}>
       <Text style={myStyles.textlogin}>
         Sign in 
       </Text>
     </TouchableOpacity>
-
+    </Link>
 
     <TouchableOpacity style={myStyles.googlebutton}>
       <Image
