@@ -1,172 +1,185 @@
-import { StyleSheet, Text, View,Image,TouchableOpacity,ScrollView } from 'react-native'
-import React from 'react'
-import  { useState } from "react";
 
+
+import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 const cart = () => {
+
+    const router = useRouter();
   const sizes = ["S", "M", "L"];
   const sizes1 = ["S"];
-  const [quantities, setQuantities] = useState(sizes.map(() => 1));
+  const pricePerItem = 4.20;
+  const [quantities, setQuantities] = useState([
+    sizes.map(() => 1),
+    sizes.map(() => 1),
+    sizes.map(() => 1),
+    sizes.map(() => 1),
+  ]);
 
-  const updateQuantity = (index, delta) => {
+  const updateQuantity = (productIndex, sizeIndex, delta) => {
     setQuantities((prevQuantities) =>
-      prevQuantities.map((qty, i) => (i === index ? Math.max(1, qty + delta) : qty))
+      prevQuantities.map((productQuantities, idx) =>
+        idx === productIndex
+          ? productQuantities.map((qty, i) =>
+              i === sizeIndex ? Math.max(1, qty + delta) : qty
+            )
+          : productQuantities
+      )
     );
   };
-  const [quantity, setQuantity] = useState(1);
 
-  const increaseQuantity = () => setQuantity(quantity + 1);
-  const decreaseQuantity = () => setQuantity(Math.max(1, quantity - 1));
+  const totalPrice = quantities.reduce(
+    (sum, productQuantities) =>
+      sum +
+      productQuantities.reduce((productSum, qty) => productSum + qty * pricePerItem, 0),
+    0
+  );
+
   return (
     <ScrollView style={styles.container}>
+      {/* Header */}
       <View style={styles.imagecontainer}>
-           <Image
-           source={require("../../assets/images/Homeleft.png")}
-           style={styles.image}
-           />
-           <Text style={styles.textcart}>Cart</Text>
-            <Image
-           source={require("../../assets/images/Homeright.png")}
-           style={styles.image}
-           />
-     </View>
-       <View style={styles.container1}>
+        <Image source={require("../../assets/images/Homeleft.png")} style={styles.image} />
+        <Text style={styles.textcart}>Cart</Text>
+         <TouchableOpacity onPress={() => router.push('/edit_profile')}>
+         <Image source={require("../../assets/images/Homeright.png")} style={styles.image} />
+              </TouchableOpacity>
+      
+      </View>
+
+      {/* Product 1 */}
+      <View style={styles.container1}>
         <View style={styles.container2}>
-      <Image source={require("../../assets/images/capuchino1.png")} style={styles.image1} />
-      <View style={styles.detailsContainer}>
-        <Text style={styles.title}>Cappuccino</Text>
-        <Text style={styles.description}>With Steamed Milk</Text>
-        <View style={styles.badgeContainer}>
-          <Text style={styles.badgeText}>Medium Roasted</Text>
-        </View>
-        </View>                        
+          <Image source={require("../../assets/images/capuchino1.png")} style={styles.image1} />
+          <View style={styles.detailsContainer}>
+            <Text style={styles.title}>Cappuccino</Text>
+            <Text style={styles.description}>With Steamed Milk</Text>
+            <View style={styles.badgeContainer}>
+              <Text style={styles.badgeText}>Medium Roasted</Text>
+            </View>
+          </View>
         </View>
         {sizes.map((size, index) => (
-          
           <View key={size} style={styles.row}>
             <Text style={styles.sizeButton}>{size}</Text>
-            <Text style={styles.price}>$ 4.20</Text>
+            <Text style={styles.price}>${pricePerItem.toFixed(2)}</Text>
             <View style={styles.quantityContainer}>
-              <TouchableOpacity onPress={() => updateQuantity(index, -1)} style={styles.quantityButton}>
+              <TouchableOpacity onPress={() => updateQuantity(0, index, -1)} style={styles.quantityButton}>
                 <Text style={styles.buttonText}>-</Text>
               </TouchableOpacity>
-              <Text style={styles.quantityText}>{quantities[index]}</Text>
-              <TouchableOpacity onPress={() => updateQuantity(index, 1)} style={styles.quantityButton}>
+              <Text style={styles.quantityText}>{quantities[0][index]}</Text>
+              <TouchableOpacity onPress={() => updateQuantity(0, index, 1)} style={styles.quantityButton}>
                 <Text style={styles.buttonText}>+</Text>
               </TouchableOpacity>
             </View>
           </View>
         ))}
-      
-       </View>
+      </View>
 
-       <View style={styles.container3}>
+      {/* Product 2 */}
+      <View style={styles.container3}>
         <Image source={require("../../assets/images/capuchino1.png")} style={styles.image2} />
         <View style={styles.detailsContainer}>
-        <Text style={styles.title}>Cappuccino</Text>
-        <Text style={styles.description}>With Steamed Milk</Text>
-        <View>
+          <Text style={styles.title}>Cappuccino</Text>
+          <Text style={styles.description}>With Steamed Milk</Text>
           {sizes1.map((size, index) => (
-          <View key={size} style={styles.row}>
-            <Text style={styles.sizeButton}>{size}</Text>
-            <Text style={styles.price}>$ 4.20</Text>
-          </View>
-        ))}
-        </View>
-        <View>
-          {sizes1.map((size, index) => (
-          <View key={size} style={styles.row1}>
-             <View style={styles.quantityContainer1}>
-              <TouchableOpacity onPress={() => updateQuantity(index, -1)} style={styles.quantityButton1}>
-                <Text style={styles.buttonText}>-</Text>
-              </TouchableOpacity>
-              <Text style={styles.quantityText1}>{quantities[index]}</Text>
-              <TouchableOpacity onPress={() => updateQuantity(index, 1)} style={styles.quantityButton2}>
-                <Text style={styles.buttonText}>+</Text>
-              </TouchableOpacity>
+            <View key={size} style={styles.row1}>
+              <View style={styles.quantityContainer1}>
+                <Text style={styles.sizeButton1}>{size}</Text>
+                <Text style={styles.price2}>${pricePerItem.toFixed(2)}</Text>
+              </View>
+              <View style={styles.quantityContainer2}>
+                <TouchableOpacity onPress={() => updateQuantity(1, index, -1)} style={styles.quantityButton}>
+                  <Text style={styles.buttonText}>-</Text>
+                </TouchableOpacity>
+                <Text style={styles.quantityText}>{quantities[1][index]}</Text>
+                <TouchableOpacity onPress={() => updateQuantity(1, index, 1)} style={styles.quantityButton}>
+                  <Text style={styles.buttonText}>+</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        ))}
+          ))}
         </View>
+      </View>
 
-        </View>
-        </View>  
-        <View style={styles.container3}>
+      {/* Product 3 */}
+      <View style={styles.container3}>
         <Image source={require("../../assets/images/capuchino1.png")} style={styles.image2} />
         <View style={styles.detailsContainer}>
-        <Text style={styles.title}>Cappuccino</Text>
-        <Text style={styles.description}>With Steamed Milk</Text>
-        <View>
+          <Text style={styles.title}>Cappuccino</Text>
+          <Text style={styles.description}>With Steamed Milk</Text>
           {sizes1.map((size, index) => (
-          <View key={size} style={styles.row}>
-            <Text style={styles.sizeButton}>{size}</Text>
-            <Text style={styles.price}>$ 4.20</Text>
-          </View>
-        ))}
-        </View>
-        <View>
-          {sizes1.map((size, index) => (
-          <View key={size} style={styles.row1}>
-             <View style={styles.quantityContainer1}>
-              <TouchableOpacity onPress={() => updateQuantity(index, -1)} style={styles.quantityButton1}>
-                <Text style={styles.buttonText}>-</Text>
-              </TouchableOpacity>
-              <Text style={styles.quantityText1}>{quantities[index]}</Text>
-              <TouchableOpacity onPress={() => updateQuantity(index, 1)} style={styles.quantityButton2}>
-                <Text style={styles.buttonText}>+</Text>
-              </TouchableOpacity>
+            <View key={size} style={styles.row1}>
+              <View style={styles.quantityContainer1}>
+                <Text style={styles.sizeButton1}>{size}</Text>
+                <Text style={styles.price2}>${pricePerItem.toFixed(2)}</Text>
+              </View>
+              <View style={styles.quantityContainer2}>
+                <TouchableOpacity onPress={() => updateQuantity(2, index, -1)} style={styles.quantityButton}>
+                  <Text style={styles.buttonText}>-</Text>
+                </TouchableOpacity>
+                <Text style={styles.quantityText}>{quantities[2][index]}</Text>
+                <TouchableOpacity onPress={() => updateQuantity(2, index, 1)} style={styles.quantityButton}>
+                  <Text style={styles.buttonText}>+</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        ))}
+          ))}
         </View>
+      </View>
 
-        </View>
-        </View>  
-        <View style={styles.container1}>
+      {/* Product 4 */}
+      <View style={styles.container1}>
         <View style={styles.container2}>
-      <Image source={require("../../assets/images/capuchino1.png")} style={styles.image1} />
-      <View style={styles.detailsContainer}>
-        <Text style={styles.title}>Cappuccino</Text>
-        <Text style={styles.description}>With Steamed Milk</Text>
-        <View style={styles.badgeContainer}>
-          <Text style={styles.badgeText}>Medium Roasted</Text>
-        </View>
-        </View>                        
+          <Image source={require("../../assets/images/capuchino1.png")} style={styles.image1} />
+          <View style={styles.detailsContainer}>
+            <Text style={styles.title}>Cappuccino</Text>
+            <Text style={styles.description}>With Steamed Milk</Text>
+            <View style={styles.badgeContainer}>
+              <Text style={styles.badgeText}>Medium Roasted</Text>
+            </View>
+          </View>
         </View>
         {sizes.map((size, index) => (
-          
           <View key={size} style={styles.row}>
             <Text style={styles.sizeButton}>{size}</Text>
-            <Text style={styles.price}>$ 4.20</Text>
+            <Text style={styles.price}>${pricePerItem.toFixed(2)}</Text>
             <View style={styles.quantityContainer}>
-              <TouchableOpacity onPress={() => updateQuantity(index, -1)} style={styles.quantityButton}>
+              <TouchableOpacity onPress={() => updateQuantity(3, index, -1)} style={styles.quantityButton}>
                 <Text style={styles.buttonText}>-</Text>
               </TouchableOpacity>
-              <Text style={styles.quantityText}>{quantities[index]}</Text>
-              <TouchableOpacity onPress={() => updateQuantity(index, 1)} style={styles.quantityButton}>
+              <Text style={styles.quantityText}>{quantities[3][index]}</Text>
+              <TouchableOpacity onPress={() => updateQuantity(3, index, 1)} style={styles.quantityButton}>
                 <Text style={styles.buttonText}>+</Text>
               </TouchableOpacity>
             </View>
           </View>
         ))}
-      
-       </View>
-       <View style={styles.footer}>
-                           <View>
-                             <Text style={styles.Price4}>Total Price</Text>
-                             <View style={styles.dola}>
-                             
-                           <Text style={styles.price3}> $ 4.20</Text>
-                           </View>
-                           </View>
-                           <TouchableOpacity style={styles.addToCartButton}>
-                             <Text style={styles.addToCartText}>PAY</Text>
-                           </TouchableOpacity>
-                         </View> 
+      </View>
+
+      {/* Total */}
+      <View style={styles.footer}>
+        <View>
+          <Text style={styles.Price4}>Total Price</Text>
+          <View style={styles.dola}>
+            <Text style={styles.price3}>${totalPrice.toFixed(2)}</Text>
+          </View>
+        </View>
+        <Link href={{ pathname: "/payment", params: { total: totalPrice.toFixed(2) } }}>
+        <TouchableOpacity style={styles.addToCartButton}>
+          <Text style={styles.addToCartText}>PAY</Text>
+        </TouchableOpacity>
+        </Link>
+      </View>
+    
     </ScrollView>
-  )
-}
+  );
+};
 
-export default cart
+export default cart;
+
+
 
 const styles = StyleSheet.create({
   tien : {
@@ -278,10 +291,27 @@ const styles = StyleSheet.create({
     width: 40,
     
   },
+  sizeButton1: {
+    backgroundColor: "#111",
+    color: "white",
+    paddingVertical: 6,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    fontSize: 14,
+    width: 40,
+    right: 12,
+    
+  },
   price: {
     color: "#D17842",
     fontSize: 16,
     fontWeight: "bold",
+  },
+  price2: {
+    color: "#D17842",
+    fontSize: 16,
+    fontWeight: "bold",
+    left: 30,
   },
   price1: {
     left: 13,
@@ -296,9 +326,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
    
   },
+  quantityContainer2: {
+    flexDirection: "row",
+    alignItems: "center",
+   justifyContent : 'space-between',
+   marginTop : 10,
+  },
   quantityContainer1: {
     flexDirection: "row",
     alignItems: "center",
+    left: 10,
   },
   
   quantityButton: {

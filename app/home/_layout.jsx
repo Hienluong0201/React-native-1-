@@ -1,8 +1,10 @@
 import { Tabs } from "expo-router";
 import { Text, Image } from "react-native";
+import { AppProvider } from "../../app-context";
 
 export default function RootLayout() {
   return (
+    <AppProvider>
     <Tabs
       screenOptions={({ route }) => {
         const icons = {
@@ -42,5 +44,6 @@ export default function RootLayout() {
       <Tabs.Screen name="favorite" options={{ title: "3" }} />
       <Tabs.Screen name="notification" options={{ title: "4" }} />
     </Tabs>
+    </AppProvider>
   );
 }
