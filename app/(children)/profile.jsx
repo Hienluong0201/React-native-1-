@@ -3,6 +3,7 @@ import { useRouter } from 'expo-router';
 import { AppContext } from "../../app-context/index"; 
 import React, { useContext, useState } from "react";
 import AxiosInstance from "../../helpers/AxiosInstance"; // Import AxiosInstance
+import Toast from 'react-native-toast-message';
 
 const Profile = () => {
   const router = useRouter();
@@ -12,6 +13,7 @@ const Profile = () => {
   const [password, setPassword] = useState('');  // Dữ liệu password mới
   const [loading, setLoading] = useState(false);
 
+  
   const handleUpdateProfile = async () => {
     try {
       setLoading(true);
@@ -22,24 +24,44 @@ const Profile = () => {
       };
 
       const response = await AxiosInstance().post('/users/update-profile', body);
-
+      console.log("reponse", response)
       // Kiểm tra xem response.data có tồn tại và có thuộc tính status không
-      if (response?.data?.status === true) {
+      if (response && response.status === true) {
         setUser({ ...user, name, email }); // Cập nhật thông tin user trong context
-        Alert.alert("Thành công", "Cập nhật thông tin thành công!");
+       // Khi cập nhật thành công
+        Toast.show({
+          type: 'success',
+          text1: 'Thành công',
+          text2: 'Cập nhật thông tin thành công!',
+        });
       } else {
-        Alert.alert("Lỗi", "Cập nhật thông tin thất bại.");
+
       }
     } catch (error) {
       if (error.response) {
         console.log('Error Response:', error.response);
-        Alert.alert("Lỗi", `Có lỗi xảy ra: ${error.response.data.message || error.message}`);
+        Toast.show({
+          type: 'error',
+          text1: 'Lỗi',
+          text2: 'Cập nhật thông tin thất bại.',
+        });
+        
       } else if (error.request) {
         console.log('Error Request:', error.request);
-        Alert.alert("Lỗi", "Không thể kết nối tới server.");
+        Toast.show({
+          type: 'error',
+          text1: 'Lỗi',
+          text2: 'Cập nhật thông tin thất bại.',
+        });
+        
       } else {
         console.log('Error Message:', error.message);
-        Alert.alert("Lỗi", "Có lỗi xảy ra trong quá trình cập nhật.");
+        Toast.show({
+          type: 'error',
+          text1: 'Lỗi',
+          text2: 'Cập nhật thông tin thất bại.',
+        });
+        
       }
     } finally {
       setLoading(false);

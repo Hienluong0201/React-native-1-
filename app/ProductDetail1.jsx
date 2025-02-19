@@ -1,85 +1,110 @@
 import { StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useLocalSearchParams } from "expo-router";
+import AxiosInstance from "../helpers/AxiosInstance";
 
 const ProductDetail1 = () => {
+  const { id } = useLocalSearchParams();
+  const [product, setProduct] = useState([]);
+  const [selectedSize, setSelectedSize] = useState("S");
+
+  const limitWords = (text, wordLimit) => {
+    if (!text) return "";
+    const words = text.split(" ");
+    return words.length > wordLimit ? words.slice(0, wordLimit).join(" ") + "..." : text;
+  };
+  
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await AxiosInstance().get(`/products/${id}`);
+        console.log("API Response:", response); // Kiểm tra dữ liệu
+        if (response?.status && response?.product) {
+          setProduct(response.product); // Lưu dữ liệu sản phẩm
+        } else {
+          console.error("Lỗi: Không tìm thấy sản phẩm");
+        }
+      } catch (error) {
+        console.error("Lỗi API:", error);
+      }
+    };
+  
+    if (id) {
+      fetchProduct();
+    }
+  }, [id]);
+  
+  if (!product || Object.keys(product).length === 0) { // Kiểm tra nếu sản phẩm chưa được load
+    return (
+      <View style={styles.container}>
+        <Text style={{ color: '#fff' }}>Loading...</Text>
+      </View>
+    );
+  }
+  
+
   return (
     <View style={styles.container}>
-      {/* Hình ảnh sản phẩm */}
-      <Image source={require('../assets/images/Mask group.png')} style={styles.productImage} />
-     <View style = { styles.cc}> 
-    
-      </View>
-      {/* Thông tin tên và nguồn gốc */}
+      <Image source={{ uri: product.image }} style={styles.productImage} />
+      <View style={styles.cc}></View>
       <View style={styles.infoContainer}>
-        <Text style={styles.productTitle}>Robusta Beans</Text>
-        <Text style={styles.productOrigin}>From Africa</Text>
-        <View style={styles.sao} >
-          <Image
-          source={require("../assets/images/sao1.png")}
-          style={styles.ngoisao}
-          />
-        <Text style={styles.productOrigin1}> 4.5 {''}</Text>
-        <Text style={styles.productOrigin2}>(6.879)</Text>
+        <Text style={styles.productTitle}>   {limitWords(product.name, 2)}</Text>
+        <Text style={styles.productOrigin}>From {product.origin}</Text>
+        <View style={styles.sao}>
+          <Image source={require("../assets/images/sao1.png")} style={styles.ngoisao} />
+          <Text style={styles.productOrigin1}> {product.rating} {''}</Text>
+          <Text style={styles.productOrigin2}>({product.reviews})</Text>
         </View>
       </View>
-      {/* Thẻ mô tả */}
       <View style={styles.tagsContainer}>
         <View style={styles.tag}>
-        <Image
-        source={require("../assets/images/bean.png")}
-        style = {styles.bean}
-        />
+          <Image source={require("../assets/images/bean.png")} style={styles.bean} />
           <Text style={styles.tagText}>Bean</Text>
-       
         </View>
         <View style={styles.tag}>
-        <Image
-        source={require("../assets/images/diachikebin.png")}
-        style = {styles.bean}
-        />
-          <Text style={styles.tagText}>Africa</Text></View>
+          <Image source={require("../assets/images/diachikebin.png")} style={styles.bean} />
+          <Text style={styles.tagText}>Africa</Text>
+        </View>
       </View>
-      <View style={styles.tagsContainer1}>
-        <View style={styles.tag1}>
-      <Text style={styles.tagText}> Medium Roasted</Text>
-      </View>
-      </View>
-
-      {/* Mô tả sản phẩm */}
       <View style={styles.descriptionContainer}>
         <Text style={styles.descriptionTitle}>Description</Text>
-        <Text style={styles.descriptionText}>
-          Arabica beans are by far the most popular type of coffee beans, making up about 60% of the world's coffee. These tasty beans originated many centuries ago in the highlands of Ethiopia and may even be the first coffee beans ever consumed!
-        </Text>
-      </View>
-      <Text style = {styles.size}>
-        SIZE
-      </Text>
-
-      {/* Kích thước và giá */}
-      <View style={styles.sizeContainer}>
-        <TouchableOpacity style={[styles.sizeOption, styles.sizeOptionSelected]}>
-          <Text style={styles.sizeText}>250gm</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sizeOption}>
-          <Text style={styles.sizeText}>500gm</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.sizeOption}>
-          <Text style={styles.sizeText}>1000gm</Text>
-        </TouchableOpacity>
+        <Text style={styles.descriptionText}>{product.description}</Text>
       </View>
       
-
-      {/* Giá và nút thêm vào giỏ hàng */}
+      <Text style={styles.size}>SIZE</Text>
+    <View style={styles.sizeContainer}>
+      {/* Nếu không có sizes, có thể hiển thị thông tin khác hoặc ẩn đi */}
+      {["S", "M", "L"].map((size) => (
+            <TouchableOpacity
+              key={size}
+              style={[
+                styles.btnSize,
+                {
+                  borderColor: selectedSize === size ? "#C67C4E" : "#141921",
+                },
+              ]}
+              onPress={() => setSelectedSize(size)}
+            >
+              <Text
+                style={{
+                  color: selectedSize === size ? "#C67C4E" : "#AEAEAE",
+                  fontSize: 16,
+                  fontWeight: "bold",
+                }}
+              >
+                {size}
+              </Text>
+            </TouchableOpacity>
+          ))}
+    </View>
       <View style={styles.footer}>
         <View>
           <Text style={styles.Price}>Price</Text>
           <View style={styles.dola}>
-           <Text style={styles.tien}>
-            $ {''}
-           </Text>
-        <Text style={styles.price}>10.50</Text>
-        </View>
+            <Text style={styles.tien}>$ {''}</Text>
+            <Text style={styles.price}>{product.price}</Text>
+          </View>
         </View>
         <TouchableOpacity style={styles.addToCartButton}>
           <Text style={styles.addToCartText}>Add to Cart</Text>
@@ -101,7 +126,20 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
 },
-  ngoisao : {
+image : {
+    width : 30,
+    height : 30
+  },
+imagecontainer : {
+  position :'absolute',
+  top :30,
+  left : 30,
+  right : 30,
+  flexDirection : 'row',
+  justifyContent : 'space-between',
+ 
+},
+ngoisao : {
     top : 2
   },
   tien : {
@@ -122,7 +160,7 @@ left : 16,
     lineHeight : 20,
     color : '#aeaeae',
     left : 20,
-    top : 8,
+    top : 27,
     fontWeight : 'bold'
   },
  sao : {
@@ -140,7 +178,7 @@ left : 16,
     backgroundColor: '#0c0f14',
   },
   productImage: {
-    width: 390,
+    width: '100%',
     height: 490,
   },
   infoContainer: {
@@ -149,13 +187,14 @@ left : 16,
     left: 20,
   },
   productTitle: {
-    fontSize: 24,
+    right:20,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
   },
   productOrigin: {
     fontSize: 14,
-    color: '#fff',
+    color: '#aeaeae',
     marginTop: 4,
   },
   productOrigin1: {
@@ -213,6 +252,7 @@ left : 16,
   tagText: {
     fontSize: 12,
     color: '#aeaeae',
+    left : 2,
   },
   descriptionContainer: {
     marginHorizontal: 20,
@@ -234,14 +274,14 @@ left : 16,
   sizeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 20,
+    marginTop: 40,
     marginHorizontal: 5,
   },
   sizeOption: {
     borderWidth: 1,
     borderColor: '#bbb',
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 40,
     borderRadius: 10,
   },
   sizeOptionSelected: {
@@ -253,11 +293,12 @@ left : 16,
     color: '#fff',
   },
   footer: {
+
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginHorizontal: 20,
-    marginTop: 20,
+    marginTop: 90,
   },
   price: {
     fontSize: 20,

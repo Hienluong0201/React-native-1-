@@ -4,9 +4,10 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, ScrollView } from 'rea
 import React, { useState } from 'react';
 import { Link } from 'expo-router';
 import { useRouter } from 'expo-router';
+import { AppContext } from "../../app-context/index";
 const cart = () => {
 
-    const router = useRouter();
+  const router = useRouter();
   const sizes = ["S", "M", "L"];
   const sizes1 = ["S"];
   const pricePerItem = 4.20;

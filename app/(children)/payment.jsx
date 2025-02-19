@@ -5,6 +5,8 @@ import { useRouter } from 'expo-router';
 import axios from 'axios';
 import { useState } from 'react';
 import { Alert } from 'react-native';
+import Toast from 'react-native-toast-message';
+import { useNotifications } from '../../app-context/index';
 
 const payment = () => {
 
@@ -12,50 +14,39 @@ const payment = () => {
 
     const router = useRouter();
     const { total } = useLocalSearchParams(); // Nhận giá trị total từ URL
-
+    const { addNotification } = useNotifications();
 
     const [loading, setLoading] = useState(false);
 
-  const handlePayment = async () => {
-    setLoading(true);
+
+  //   const handlePayment = () => {
+  //     // Thêm thông báo vào danh sách
+  //     // Thêm thông báo vào danh sách
+  //   addNotification('Bạn đã thanh toán thành công!');
+  //   console.log("Thanh toán thành công!");  // Đảm bảo hàm này được gọi
+  //   addNotification('Bạn đã thanh toán thành công!');
+  //   console.log("Thông báo đã được thêm vào context!"); 
+  //     // Hiển thị thông báo tạm thời
+  //     // Toast.show({
+  //     //     type: 'success',
+  //     //     text1: 'Thanh toán',
+  //     //     text2: 'Bạn đã thanh toán thành công!',
+  //     // });
+
+  //     // Chuyển hướng đến trang Notification
+  //     router.push('/home/notification');
+  // };
+  const handlePayment = () => {
+    // Thêm thông báo vào danh sách
+    console.log('Thêm thông báo mới: Bạn đã thanh toán thành công!');
+    addNotification('Bạn đã thanh toán thành công!');
+    console.log("Thanh toán thành công!");  // Log để đảm bảo hàm này được gọi
     
-    try {
-      const response = await axios.post('https://api.vietqr.io/v2/generate', {
-        accountNo: '123456789', // Thay số tài khoản của bạn
-        accountName: 'Nguyen Van A', // Thay tên người nhận
-        acqId: '970422', // Mã ngân hàng (VD: Vietcombank là 970436)
-        amount: 100000, // Số tiền (VND)
-        addInfo: 'Thanh toan don hang', // Nội dung chuyển khoản
-        format: 'json',
-      });
-
-      if (response.data && response.data.data) {
-        const qrCode = response.data.data.qrDataURL;
-
-        // Hiển thị alert thành công và mã QR đã được tạo
-        Alert.alert(
-          'Thanh toán thành công!',
-          'Mã QR đã được tạo thành công. Bạn có thể quét mã QR để thực hiện thanh toán.',
-          [
-            { text: 'OK' }
-          ]
-        );
-      }
-    } catch (error) {
-      console.error('Lỗi khi gọi API:', error);
-      
-      // Hiển thị alert lỗi nếu gọi API thất bại
-      Alert.alert(
-        'Lỗi',
-        'Đã có lỗi xảy ra khi tạo mã QR. Vui lòng thử lại sau.',
-        [
-          { text: 'OK' }
-        ]
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
+    // Chuyển hướng đến trang Notification
+    router.push('/home/notification');
+};
+    
+ 
 
   return (
     <View style={styles.container}> 

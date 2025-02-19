@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Image, TextInput, TouchableOpacity, ScrollView 
 import React, { useEffect, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
 import AxiosInstance from "../../helpers/AxiosInstance";
+import { router } from "expo-router";
 
 const dom = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -67,6 +68,7 @@ const dom = () => {
   const handleCategoryPress = (index) => {
     console.log("Danh mục được chọn:", index); 
     setSelectedIndex(index);
+    
   };
 
   const rendercatigory = ({ item, index }) => (
@@ -87,6 +89,42 @@ const dom = () => {
       {index === selectedIndex && <View style={styles.circle} />}
     </TouchableOpacity>
   );
+
+
+  const [products1, setProducts1] = useState([]); // Lưu danh sách sản phẩm
+  const [loading, setLoading] = useState(true); // Trạng thái loading
+  const [error, setError] = useState(null); // Lưu lỗi
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await AxiosInstance().get('/products?category=65b07ddcfc13ae4836b4cb08');
+        console.log("API response:", response); // Log toàn bộ phản hồi API
+        if (Array.isArray(response.products)) { 
+          console.log("📌 Sản phẩm từ API:", response.products);
+          setProducts1(response.products);
+        } else {
+          console.log("❌ API không trả về danh sách sản phẩm:", response);
+        }
+        
+        
+      } catch (err) {
+        console.log("Lỗi khi gọi API:", err); // Log lỗi
+        setError(err.message); // Lưu lỗi vào state
+      } finally {
+        setLoading(false); // Đặt trạng thái loading là false
+      }
+    };
+  
+    fetchProducts();
+  }, []);
+  
+
+
+
+
+
+
 
   return (
     <View style={styles.container}>
@@ -118,17 +156,24 @@ const dom = () => {
           <FlashList
             data={products}
             renderItem={({ item }) => (
-              <View style={styles.productCard}>
+              <TouchableOpacity style={styles.productCard}
+              onPress={() => {
+                router.push({
+                  pathname: "/ProductDetail1",
+                  params: { id: item._id }, // Truyền ID sản phẩm
+                });
+              }}
+              >
                 {/* Hiển thị đánh giá */}
-                <View style={styles.ratingContainer}>
-                  <Text style={styles.ratingText}>⭐ {item.rating}</Text>
+                <View style={styles.ratingContainer1}>
+                  <Text style={styles.ratingText1}>⭐ {item.rating}</Text>
                 </View>
 
                 {/* Ảnh sản phẩm */}
                 <Image source={{ uri: item.image }} style={styles.productImage} />
 
                 {/* Thông tin sản phẩm */}
-                <Text style={styles.productTitle}>{item.name}</Text>
+                <Text style={styles.productTitle} numberOfLines={1}>{item.name}</Text>
                 <Text style={styles.productDescription}  numberOfLines={3}>{item.description}</Text>
 
                 {/* Footer sản phẩm */}
@@ -139,7 +184,7 @@ const dom = () => {
                     <Text style={styles.addButtonText}>+</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
+              </TouchableOpacity>
             )}
             estimatedItemSize={150}
             horizontal
@@ -149,9 +194,9 @@ const dom = () => {
         )}
 
     <Text style={styles.Coffeebeans}>Coffee beans</Text> 
-        {products.length > 0 && (
+    {products1.length > 0 && (
           <FlashList
-            data={products}
+            data={products1}
             renderItem={({ item }) => (
               <View style={styles.productCard}>
                 {/* Hiển thị đánh giá */}
@@ -182,6 +227,7 @@ const dom = () => {
             keyExtractor={(item) => item._id.toString()}
           />
         )}
+       
       </ScrollView>
               
       
@@ -263,8 +309,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderBottomLeftRadius: 20,
-    borderTopRightRadius: 5,
+    borderTopRightRadius: 10,
     zIndex: 10,
+  },
+  ratingContainer1: {
+    position: "absolute",
+    top:12,
+    right: 11.5, // Thay vì `left: 90`
+    backgroundColor: "#000000aa",
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderBottomLeftRadius: 20,
+    borderTopRightRadius: 10,
+    zIndex: 10,
+  },
+  ratingText1: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: "#fff",
   },
   ratingText: {
     fontSize: 12,
